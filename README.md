@@ -18,6 +18,7 @@ Replace the value of the `ECS_CLUSTER` environment variable in the workflow belo
 The format should follow the output of `aws ecs register-task-definition --generate-cli-skeleton`.
 Replace the value of the `ECS_TASK_DEFINITION` environment variable in the workflow below with the path to the JSON file.
 Replace the value of the `CONTAINER_NAME` environment variable in the workflow below with the name of the container in the `containerDefinitions` section of the task definition.
+If you are using the short WOrk-Flow Yaml file, then enter the number of task/s manually while creating the service inside the cluster.
 
 ### 4. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
 See the documentation for each action used below for the recommended IAM policies for this IAM user, and best practices on handling the access key credentials.

@@ -5,5 +5,5 @@ RUN apt-get install apache2 -y
 RUN apt-get install apache2-utils -y
 RUN apt-get clean
 EXPOSE 80
-RUN echo "<H1> Hello From App-Server </H1>" > /var/www/html/index.html
+RUN echo "<H1> Hello From Web-Server </H1>" > /var/www/html/index.html
 CMD ["apache2ctl","-D","FOREGROUND"]
