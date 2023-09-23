@@ -22,3 +22,10 @@ If you are using the short WOrk-Flow Yaml file, then enter the number of task/s 
 
 ### 4. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
 See the documentation for each action used below for the recommended IAM policies for this IAM user, and best practices on handling the access key credentials.
+
+### 5. If we need a Load-Balancer with our service
+For this, we can create an Application Load Balancer with a Target Group of IP-Address Type not Instance type as we did for EC2 based ECS deployment.
+Do not select ant IP address and port while creating the target group.
+Just simply create a dummy Target group.
+Then Create an application load balancer with all the default settings as per the networking & SG you need & attach the created target group with the application load balancer.
+And while adding this with the ECS-Service, add all the Load-Balancing stuffs from the existing one, where you will see your created TG & ALB.
