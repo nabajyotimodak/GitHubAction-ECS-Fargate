@@ -17,6 +17,7 @@ env:
   ECS_TASK_DEFINITION: .github/workflows/task-definition.json      # set this to the path to your Amazon ECS task definition                                           # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: demo-deploy           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
+  BRANCH_NAME: main
 
 
 jobs:
@@ -46,22 +47,18 @@ jobs:
             exit 1
           fi
 
-    - name: Login to Amazon ECR.
+    - name: Build Docker image
+      run: |
+        docker build -t gitactions-ecs:${{ env.BRANCH_NAME }}-${{ github.run_number }} .
+        docker tag gitactions-ecs:${{ env.BRANCH_NAME }}-${{ github.run_number }} 793229168581.dkr.ecr.us-east-1.amazonaws.com/demo-deploy:${{ env.BRANCH_NAME }}-${{ github.run_number }}
+
+    - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push Docker image from the Dockerfile to Amazon ECR repository.
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
+    - name: Push Docker image to Amazon ECR
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        docker push 793229168581.dkr.ecr.us-east-1.amazonaws.com/demo-deploy:${{ env.BRANCH_NAME }}-${{ github.run_number }}
 
     - name: Fill in the new image ID in the Amazon ECS task definition.
       id: task-def
