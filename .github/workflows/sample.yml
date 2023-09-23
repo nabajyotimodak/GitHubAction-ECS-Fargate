@@ -2,7 +2,7 @@
 # and then will deploy a new task definition to Amazon ECS, when there is a push to the "main" branch.
 
 
-name: Deploy to Amazon ECS Fargate
+name: Deploy to Amazon ECS Fargate.
 
 on:
   push:
@@ -17,8 +17,6 @@ env:
   ECS_TASK_DEFINITION: .github/workflows/task-definition.json      # set this to the path to your Amazon ECS task definition                                           # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: demo-deploy           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
-  BRANCH_NAME: main
-
 
 jobs:
   deploy:
@@ -47,18 +45,22 @@ jobs:
             exit 1
           fi
 
-    - name: Build Docker image
-      run: |
-        docker build -t gitactions-ecs:${{ env.BRANCH_NAME }}-${{ github.run_number }} .
-        docker tag gitactions-ecs:${{ env.BRANCH_NAME }}-${{ github.run_number }} 793229168581.dkr.ecr.us-east-1.amazonaws.com/demo-deploy:${{ env.BRANCH_NAME }}-${{ github.run_number }}
-
-    - name: Login to Amazon ECR
+    - name: Login to Amazon ECR.
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Push Docker image to Amazon ECR
+    - name: Build, tag, and push Docker image from the Dockerfile to Amazon ECR repository.
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.run_number }}
       run: |
-        docker push 793229168581.dkr.ecr.us-east-1.amazonaws.com/demo-deploy:${{ env.BRANCH_NAME }}-${{ github.run_number }}
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
     - name: Fill in the new image ID in the Amazon ECS task definition.
       id: task-def
